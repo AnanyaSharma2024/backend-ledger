@@ -6,8 +6,11 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-const authRoutes = require("./routes/auth.routes");
-
-app.use("/api/auth", authRoutes);
+//routers
+const authRouter = require("./routes/auth.routes");
+const accountRouter = require("./routes/account.routes");
+//mounting the routers
+app.use("/api/accounts", accountRouter);
+app.use("/api/auth", authRouter);
 
 module.exports = app;
