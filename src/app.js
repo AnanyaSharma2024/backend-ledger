@@ -9,8 +9,11 @@ app.use(express.json());
 //routers
 const authRouter = require("./routes/auth.routes");
 const accountRouter = require("./routes/account.routes");
+const transactionRouter = require("./routes/transaction.routes");
+
 //mounting the routers
 app.use("/api/accounts", accountRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/transactions", transactionRouter);
 
 module.exports = app;

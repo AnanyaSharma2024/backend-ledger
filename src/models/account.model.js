@@ -13,6 +13,10 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: [true, "Account name is required"]
   },
+  balance: {
+    type: Number,
+    default: 0
+  },
 // Status of the account (e.g., "ACTIVE", "FROZEN", "CLOSED")
   status: {
     type: String,
