@@ -1,11 +1,11 @@
-const accountModels = require("../models/account.model");
+const accountModel = require("../models/account.model");
 
 async function createAccountController(req, res) {
 
     const user = req.user;
     const { name, currency } = req.body;
 
-    const account = await accountModels.create({
+    const account = await accountModel.create({
         user: user._id,
         name,
         currency,
@@ -20,7 +20,7 @@ async function createAccountController(req, res) {
 
 async function getUserAccountsController(req, res) {
 
-    const accounts = await accountModels.find({
+    const accounts = await accountModel.find({
         user: req.user._id
     });
 
@@ -30,17 +30,19 @@ async function getUserAccountsController(req, res) {
 }
 
 async function getAccountBalanceController(req, res) {
+
     const { accountId } = req.params;
-    const account = await accountModels.findOne({
-        _id: accountId,
-        user: req.user._id
-    });
+
+    const account = await accountModel.findById(accountId);
+
     if (!account) {
         return res.status(404).json({
             message: "Account not found"
         });
     }
+
     const balance = await account.getBalance();
+
     res.status(200).json({
         accountId,
         balance
@@ -49,7 +51,7 @@ async function getAccountBalanceController(req, res) {
 
 async function getAccountByIdController(req, res) {
 
-    const account = await accountModels.findById(req.params.id);
+    const account = await accountModel.findById(req.params.id);
 
     if (!account) {
         return res.status(404).json({

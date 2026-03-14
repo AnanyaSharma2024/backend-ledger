@@ -111,6 +111,8 @@ async function createTransaction(req, res) {
          * 5. Create transaction (PENDING)
          */
         const session = await mongoose.startSession()
+        //sabkuch ya kuch bhi nh 
+        //start transaction karo jise agar beech me kuch bhi error aata hai to hum us transaction ko roll back kar sake
         session.startTransaction()
 
         transaction = (await transactionModel.create([ {

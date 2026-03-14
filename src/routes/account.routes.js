@@ -13,6 +13,7 @@ router.get("/", authMiddleware, accountController.getUserAccountsController);
 // GET /api/accounts/balance/:accountId
 router.get("/balance/:accountId", authMiddleware, accountController.getAccountBalanceController);
 
+// GET /api/accounts/:id
 router.get("/:id", authMiddleware, accountController.getAccountByIdController);
 
 module.exports = router;

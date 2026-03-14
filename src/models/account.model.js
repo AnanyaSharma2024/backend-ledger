@@ -1,23 +1,25 @@
 const mongoose = require("mongoose");
-// Account model to represent user accounts in the ledger system
+const ledgerModel = require("./ledger.model");
+
 const accountSchema = new mongoose.Schema({
-// Reference to the user who owns the account
+
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: [true, "User is required"],
     index: true
   },
-// Name of the account (e.g., "Savings", "Checking")
+
   name: {
     type: String,
     required: [true, "Account name is required"]
   },
+
   balance: {
     type: Number,
     default: 0
   },
-// Status of the account (e.g., "ACTIVE", "FROZEN", "CLOSED")
+
   status: {
     type: String,
     enum: {
@@ -26,19 +28,56 @@ const accountSchema = new mongoose.Schema({
     },
     default: "ACTIVE"
   },
-// Currency of the account (e.g., "USD", "INR")
+
   currency: {
     type: String,
     required: [true, "Currency is required"],
     default: "INR"
   }
-// Timestamps for createdAt and updatedAt
+
 }, { timestamps: true });
 
-// Compound index to ensure unique account names per user
+
+// unique account name per user
 accountSchema.index({ user: 1, name: 1 }, { unique: true });
 
-// Create the Account model
+
+// get account balance from ledger
+accountSchema.methods.getBalance = async function () {
+
+  const balanceData = await ledgerModel.aggregate([
+    { $match: { account: this._id } },
+
+    {
+      $group: {
+        _id: null,
+        totalDebit: {
+          $sum: {
+            $cond: [{ $eq: ["$type", "DEBIT"] }, "$amount", 0]
+          }
+        },
+        totalCredit: {
+          $sum: {
+            $cond: [{ $eq: ["$type", "CREDIT"] }, "$amount", 0]
+          }
+        }
+      }
+    },
+
+    {
+      $project: {
+        _id: 0,
+        balance: { $subtract: ["$totalCredit", "$totalDebit"] }
+      }
+    }
+
+  ]);
+
+  return balanceData.length ? balanceData[0].balance : 0;
+};
+
+
+
 const accountModel = mongoose.model("Account", accountSchema);
 
-module.exports = accountModel;
+module.exports =  accountModel ;
